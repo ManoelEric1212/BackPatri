@@ -94,4 +94,64 @@ router.post("/verificar/global", async (req, res) => {
   });
 });
 
+router.post("/verificar/local", async (req, res) => {
+  const { local, cods } = req.body;
+
+  if (!local || !Array.isArray(cods)) {
+    return res
+      .status(400)
+      .json({ error: "Dados inválidos. Envie 'local' e um array de 'cods'." });
+  }
+
+  try {
+    // Bens cadastrados para o local informado
+    const bensNoLocal = await prisma.relacaoAtivos.findMany({
+      where: { local },
+    });
+
+    // Bens com os códigos enviados
+    const bensInformados = await prisma.relacaoAtivos.findMany({
+      where: {
+        codBem: { in: cods },
+      },
+    });
+
+    const codsNoLocal = bensNoLocal.map((bem) => bem.codBem);
+    const codsInformados = new Set(cods);
+
+    // Itens conferidos corretamente
+    const conferidos = bensNoLocal.filter((bem) =>
+      codsInformados.has(bem.codBem)
+    );
+
+    // Itens faltantes no local (deveriam estar, mas não foram enviados)
+    const faltantes = bensNoLocal.filter(
+      (bem) => !codsInformados.has(bem.codBem)
+    );
+
+    // Itens de outro local (foram enviados, mas pertencem a outro local)
+    const deOutroLocal = bensInformados.filter((bem) => bem.local !== local);
+
+    // Monta a resposta
+    res.json({
+      totalInformados: cods.length,
+      totalCadastradosNoLocal: codsNoLocal.length,
+      conferidos: conferidos.length,
+      faltantes: faltantes.length,
+      deOutroLocal: deOutroLocal.map((bem) => ({
+        codBem: bem.codBem,
+        descricao: bem.descricao,
+        localCadastrado: bem.local,
+      })),
+      itensFaltantes: faltantes.map((bem) => ({
+        codBem: bem.codBem,
+        descricao: bem.descricao,
+      })),
+    });
+  } catch (error) {
+    console.error("Erro ao verificar itens:", error);
+    res.status(500).json({ error: "Erro interno do servidor." });
+  }
+});
+
 module.exports = router;
