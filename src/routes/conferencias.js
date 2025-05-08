@@ -137,10 +137,10 @@ router.post("/verificar/local", async (req, res) => {
       totalInformados: cods.length,
       totalCadastradosNoLocal: codsNoLocal.length,
       conferidos: conferidos.length,
-      itensConferidos: {
+      itensConferidos: conferidos.map((bem) => ({
         codBem: bem.codBem,
         descricao: bem.descricao,
-      },
+      })),
       faltantes: faltantes.length,
       deOutroLocal: deOutroLocal.map((bem) => ({
         codBem: bem.codBem,
