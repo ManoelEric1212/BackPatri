@@ -8,15 +8,15 @@ datasource db {
 }
 
 model RelacaoAtivos {
-  codBem        Int      @id
+  codBem        String @id
   descricao     String
   modeloProd    String
   fabricaProd   String
-  dataAquisicao DateTime
+  dataAquisicao String
   endereco      String
   local         String
-  valorCompra   Float
-  valorResidual Float
+  valorCompra   String
+  valorResidual String
   grupo         String
 
   itensConferidos ItemConferencia[]
@@ -32,7 +32,7 @@ model Conferencia {
 
 model ItemConferencia {
   id              Int     @id @default(autoincrement())
-  codBem          Int
+  codBem          String
   localVerificado String
   pertence        Boolean
   localReal       String?
