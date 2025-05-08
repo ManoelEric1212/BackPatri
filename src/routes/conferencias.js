@@ -61,8 +61,36 @@ router.post("/verificar", async (req, res) => {
     codBem: ativo.codBem,
     descricao: ativo.descricao,
     localCadastrado: ativo.local,
+    valorCompra: ativo.valorCompra,
+    valorResidual: ativo.valorResidual,
+    dataAquisicao: ativo.dataAquisicao,
+    grupo: ativo.grupo,
+    fabricaProd: ativo.fabricaProd,
+    modeloProd: ativo.modeloProd,
     localVerificado,
     pertence,
+  });
+});
+
+router.post("/verificar/global", async (req, res) => {
+  const { codBem } = req.body;
+
+  const ativo = await prisma.relacaoAtivos.findUnique({ where: { codBem } });
+
+  if (!ativo) {
+    return res.status(404).json({ error: "Bem não encontrado." });
+  }
+
+  res.json({
+    codBem: ativo.codBem,
+    descricao: ativo.descricao,
+    localCadastrado: ativo.local,
+    valorCompra: ativo.valorCompra,
+    valorResidual: ativo.valorResidual,
+    dataAquisicao: ativo.dataAquisicao,
+    grupo: ativo.grupo,
+    fabricaProd: ativo.fabricaProd,
+    modeloProd: ativo.modeloProd,
   });
 });
 
